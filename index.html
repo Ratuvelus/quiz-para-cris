@@ -19,6 +19,8 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden; /* Para asegurarnos de que la animación se vea dentro del contenedor */
         }
         h1 {
             margin-top: 0;
@@ -76,10 +78,34 @@
         .hidden {
             display: none;
         }
+
+        /* Animaciones flash verde y rojo */
+        .flash-correct {
+            animation: flashCorrect 0.3s linear;
+        }
+        .flash-incorrect {
+            animation: flashIncorrect 0.3s linear;
+        }
+        @keyframes flashCorrect {
+            0% {
+                box-shadow: 0 0 100vmax 100vmax rgba(0, 255, 0, 0.4);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 0, 0);
+            }
+        }
+        @keyframes flashIncorrect {
+            0% {
+                box-shadow: 0 0 100vmax 100vmax rgba(255, 0, 0, 0.4);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="main-container">
         <h1>EXAMEN</h1>
         <div id="quiz">
             <p class="question" id="question">Cargando...</p>
@@ -203,6 +229,7 @@
         let currentQuestion = 0;
         let score = 0;
         let quizOver = false;
+        const container = document.getElementById("main-container");
 
         function loadQuestion() {
             if (currentQuestion >= quizData.length) {
@@ -226,9 +253,29 @@
         function checkAnswer(selected, correct) {
             if (selected === correct) {
                 score++;
+                flashCorrect();
+            } else {
+                flashIncorrect();
             }
             currentQuestion++;
-            loadQuestion();
+            setTimeout(loadQuestion, 400); // Espera un poco para que se vea la animación
+        }
+
+        // Animaciones correct/incorrect
+        function flashCorrect() {
+            container.classList.remove("flash-incorrect");
+            container.classList.add("flash-correct");
+            setTimeout(() => {
+                container.classList.remove("flash-correct");
+            }, 300);
+        }
+
+        function flashIncorrect() {
+            container.classList.remove("flash-correct");
+            container.classList.add("flash-incorrect");
+            setTimeout(() => {
+                container.classList.remove("flash-incorrect");
+            }, 300);
         }
 
         // Lógica de la pregunta BONUS
@@ -237,7 +284,6 @@
             const bonusResult = document.getElementById("bonus-result");
 
             // Buscamos alguna de estas palabras clave: "estados", "unidos", "himno", "usa"
-            // si el usuario escribe algo como "himno estados unidos" o "USA"...
             const pattern = /estados|unidos|himno|usa/i;
 
             if (pattern.test(userAnswer)) {
