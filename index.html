@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXAMEN</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #fff9c4; /* Fondo amarillo claro */
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 700px;
+            margin: 50px auto;
+            background: #fffde7; /* Contenedor con tono suave de amarillo */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            margin-top: 0;
+            color: #ffca28; /* Título dorado */
+        }
+        .question {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #795548;
+        }
+        .options button {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ffca28; /* Botones dorados */
+            color: #424242;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .options button:hover {
+            background-color: #ffb300; /* Un poco más oscuro al pasar el mouse */
+        }
+        #result {
+            font-size: 22px;
+            margin-top: 20px;
+            color: #f57c00;
+        }
+        .bonus-container {
+            margin-top: 20px;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 8px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .check-bonus {
+            background-color: #ffa726;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .check-bonus:hover {
+            background-color: #fb8c00;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EXAMEN</h1>
+        <div id="quiz">
+            <p class="question" id="question">Cargando...</p>
+            <div class="options" id="options"></div>
+        </div>
+        <p id="result"></p>
+        <div id="bonus-section" class="bonus-container hidden">
+            <h2>¡Pregunta BONUS (no cuenta para la puntuación)!</h2>
+            <p>¿Qué canción es la única que cantaría Nacho en un Karaoke?</p>
+            <input type="text" id="bonus-input" placeholder="Escribe la respuesta..." />
+            <button class="check-bonus" onclick="checkBonus()">Comprobar</button>
+            <p id="bonus-result"></p>
+        </div>
+    </div>
+
+    <script>
+        // Preguntas oficiales
+        const quizData = [
+            {
+                question: "1. Si Nacho se transformara en un alimento en una película de terror, ¿qué sería y por qué?",
+                options: [
+                    "Un nacho embrujado que grita bañándose en queso permanentemente.",
+                    "Un aguacate duro (del VIPS).",
+                    "Vómito de manzana de ese.",
+                    "Arroz (xd)"
+                ],
+                answer: "Un nacho embrujado que grita bañándose en queso permanentemente."
+            },
+            {
+                question: "2. Si Nacho solo pudiese comunicarse con memes, ¿cuál usaría para decir 'te quiero'?",
+                options: [
+                    "El gato llorando con un arcoíris de fondo.",
+                    "I AM THE FLASH.",
+                    "Shrek bailando bachata (por razones inexplicables).",
+                    "Un meme de facebook que enviaría su madre por whatsapp"
+                ],
+                answer: "Shrek bailando bachata (por razones inexplicables)."
+            },
+            {
+                question: "3. ¿Qué haría Nacho si descubriera que Cris es un alienígena enviada a estudiar a seres que parecen alienígenas pero no lo son (Jose, Julián, Pedro...)?",
+                options: [
+                    "Pedirle que analice primero a Ángel, Alejandro y Ouxiang.",
+                    "Crear un TikTok: 'Mi novia es de Urano, hagan sus preguntas'.",
+                    "Tener sexo alienígena.",
+                    "GG, we lost"
+                ],
+                answer: "Tener sexo alienígena."
+            },
+            {
+                question: "4. Es IMPOSIBLE que Nacho haga esto:",
+                options: [
+                    "Mantener la calma en una partida de League of Legends.",
+                    "Producir el mejor cortometraje dirigido por Cris :D",
+                    "Tener la misma opinión durante más de una semana sobre algo importante",
+                    "Dejar de querer a Cris"
+                ],
+                answer: "Dejar de querer a Cris"
+            },
+            {
+                question: "5. Si Nacho tuviera que sobrevivir en una isla desierta con un solo objeto de la casa, ¿qué elegiría?",
+                options: [
+                    "Er movi.",
+                    "Un Julián inmortal (así saldría por huevos).",
+                    "A Cris (trata a las mujeres como objetos).",
+                    "Queso"
+                ],
+                answer: "Queso"
+            },
+            {
+                question: "6. ¿Qué es lo que más odia Nacho del mundo?",
+                options: [
+                    "Tener que explicar las cosas.",
+                    "Perder en el LoL.",
+                    "Las acelgas.",
+                    "La injusticia social y el hambre en el mundo"
+                ],
+                answer: "Perder en el LoL."
+            },
+            {
+                question: "7. Si Nacho fuera un villano de Marvel, ¿cuál sería su plan maestro?",
+                options: [
+                    "Obligar al mundo a escuchar INTERESTELLAR permanentemente.",
+                    "Que el queso fuese la única comida (en todas sus variables).",
+                    "ACABAR CON TODAS LAS PERSONAS QUE HAGAN DAÑO A CRIS.",
+                    "Todas por supuesto"
+                ],
+                answer: "Todas por supuesto"
+            },
+            {
+                question: "8. En un apocalipsis zombie, ¿qué haría Nacho para que os salváseis?",
+                options: [
+                    "Ponerse colonia/AXE de homgre y así espantaría a todos los zombies.",
+                    "Sacrificarse por Cris.",
+                    "Traerse a Aria con ellos (estaría permanentemente en modo ataque, GG).",
+                    "Reflexionar"
+                ],
+                answer: "Reflexionar"
+            },
+            {
+                question: "9. Si Nacho y Cris fueran un dúo de detectives, ¿cuál sería su área de especialidad?",
+                options: [
+                    "Ninguna lol",
+                    "Asesinatos",
+                    "¿No eh sohpechosoh?",
+                    "Pues los homicidios en tercer grado (saludos, soy Carles Porta)"
+                ],
+                answer: "¿No eh sohpechosoh?"
+            },
+            {
+                question: "10. ¿Cuál sería el regalo perfecto para Nacho?",
+                options: [
+                    "Un viaje a USA con Cris",
+                    "Un piano Stainway tipo D",
+                    "Un montón de legos de Star Wars enormes",
+                    "Una cena en la Tagliatela"
+                ],
+                answer: "Un viaje a USA con Cris"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let quizOver = false;
+
+        function loadQuestion() {
+            if (currentQuestion >= quizData.length) {
+                // Mostramos resultados
+                document.getElementById("quiz").innerHTML = `\n                    <h2>¡Juego Terminado! 🎉</h2>\n                    <p>Has acertado ${score} de ${quizData.length} preguntas.</p>\n                `;
+                document.getElementById("bonus-section").classList.remove("hidden");
+                quizOver = true;
+                return;
+            }
+            const q = quizData[currentQuestion];
+            document.getElementById("question").innerText = q.question;
+            document.getElementById("options").innerHTML = "";
+            q.options.forEach(option => {
+                const btn = document.createElement("button");
+                btn.innerText = option;
+                btn.onclick = () => checkAnswer(option, q.answer);
+                document.getElementById("options").appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, correct) {
+            if (selected === correct) {
+                score++;
+            }
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        // Lógica de la pregunta BONUS
+        function checkBonus() {
+            const userAnswer = document.getElementById("bonus-input").value.trim().toLowerCase();
+            const bonusResult = document.getElementById("bonus-result");
+
+            // Buscamos alguna de estas palabras clave: "estados", "unidos", "himno", "usa"
+            // si el usuario escribe algo como "himno estados unidos" o "USA"...
+            const pattern = /estados|unidos|himno|usa/i;
+
+            if (pattern.test(userAnswer)) {
+                bonusResult.innerText = "¡Correcto! Parece que conoces a Nacho de verdad.";
+                bonusResult.style.color = "green";
+            } else {
+                bonusResult.innerText = "Hmm... No parece ser esa la canción. TRY AGAAIN";
+                bonusResult.style.color = "red";
+            }
+        }
+
+        // Cargamos la primera pregunta
+        loadQuestion();
+    </script>
+</body>
+</html>
